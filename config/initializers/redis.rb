@@ -1,0 +1,1 @@
+REDIS = Redis::Namespace.new("acm_api", :redis => Redis.new)
