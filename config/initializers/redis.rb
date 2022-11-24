@@ -1,1 +1,1 @@
-REDIS = Redis::Namespace.new("acm_api", :redis => Redis.new)
+REDIS = Redis::Namespace.new("acm_api", redis: Redis.new(host: ENV['REDIS_HOST']))

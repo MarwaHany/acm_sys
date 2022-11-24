@@ -1,5 +1,14 @@
 version: '3.7'
 services:
+  db: 
+    image: mysql
+    ports:
+      - '3306:3306'
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+    command: --default-authentication-plugin=mysql_native_password
+    volumes:
+      - mysql_chat_system:/var/lib/mysql:delegated
   es01:
     image: docker.elastic.co/elasticsearch/elasticsearch:7.16.3
     container_name: es01
@@ -8,6 +17,7 @@ services:
       - bootstrap.memory_lock=true
       - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
       - discovery.type=single-node
+      - xpack.security.enabled=false
     ulimits:
       memlock:
         soft: -1
@@ -16,13 +26,6 @@ services:
       - data01:/usr/share/elasticsearch/data
     ports:
       - 9200:9200
-  db: 
-    image: mysql
-    environment:
-        MYSQL_ROOT_PASSWORD: root
-    volumes:
-      - mysql_chat_system:/var/lib/mysql:delegated
-    command: --default-authentication-plugin=mysql_native_password
   redis:
     image: redis:alpine
     restart: always
@@ -33,7 +36,7 @@ services:
     command: redis-server
   web:
     build: .
-    command: bash -c "bash ./init.sh && bundle exec rails s -p 3000 -b '0.0.0.0'"
+    command: bash -c "bash init.sh && bundle exec rails s -p 3000 -b '0.0.0.0'"
     restart: on-failure
     environment:
       - REDIS_HOST=redis
